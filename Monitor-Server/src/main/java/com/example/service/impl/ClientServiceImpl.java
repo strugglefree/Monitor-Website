@@ -2,14 +2,20 @@ package com.example.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Client;
+import com.example.entity.dto.ClientDetail;
+import com.example.entity.vo.request.ClientDetailVO;
+import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientMapper;
 import com.example.service.ClientService;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,6 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> implements ClientService {
+
+    @Resource
+    private ClientDetailMapper mapper;
 
     private String registerToken = this.generateToken();
 
@@ -93,6 +102,24 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
             }
         }
         return false;
+    }
+
+    /**
+     * @description: 往数据库里面填入客户端信息
+     * @param: [clientDetail]
+     * @return: void
+     * @author Ll
+     * @date: 2024/7/30 下午4:09
+     */
+    @Override
+    public void updateClientDetail(ClientDetailVO vo, Client client) {
+        ClientDetail detail = new ClientDetail();
+        BeanUtils.copyProperties(vo,detail);
+        detail.setId(client.getId());
+        if(Objects.nonNull(mapper.selectById(client.getId()))) {
+            mapper.updateById(detail);
+        }else
+            mapper.insert(detail);
     }
 
     /**
