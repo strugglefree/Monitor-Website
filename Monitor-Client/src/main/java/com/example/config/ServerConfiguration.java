@@ -2,6 +2,7 @@ package com.example.config;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.example.entity.ConnectionConfig;
+import com.example.utils.MonitorUtils;
 import com.example.utils.NetUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,9 @@ public class ServerConfiguration {
     @Resource
     private NetUtil net;
 
+    @Resource
+    private MonitorUtils utils;
+
     /**
      * @description: 连接服务器
      * @param: []
@@ -41,6 +45,7 @@ public class ServerConfiguration {
         if(connectionConfig == null){
             connectionConfig = this.registerToServer();
         }
+        System.out.println(utils.monitorBaseDetail());
         return connectionConfig;
     }
 
