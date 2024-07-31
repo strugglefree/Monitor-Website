@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.example.entity.BaseDetail;
 import com.example.entity.ConnectionConfig;
 import com.example.entity.Response;
+import com.example.entity.RuntimeDetail;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -60,6 +61,20 @@ public class NetUtil {
             log.info("系统基本信息已更新完成");
         }else
             log.error("系统基本信息更新失败：{}", response.message());
+    }
+
+    /**
+     * @description: 将客户端自身运行时相关参数发给服务端
+     * @param: [runtimeDetail]
+     * @return: void
+     * @author Ll
+     * @date: 2024/7/31 下午1:31
+     */
+    public void updateRuntimeDetail(RuntimeDetail runtimeDetail){
+        Response response = this.doPost("/runtime", runtimeDetail);
+        if(!response.success()){
+            log.error("更新运行时状态中，接收到服务端异常响应内容: {}", response.message());
+        }
     }
 
     /**
