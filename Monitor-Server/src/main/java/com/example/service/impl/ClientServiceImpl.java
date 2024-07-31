@@ -8,9 +8,11 @@ import com.example.entity.vo.request.RuntimeDetailVO;
 import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientMapper;
 import com.example.service.ClientService;
+import com.example.utils.InfluxDBUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -30,11 +32,15 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Resource
     private ClientDetailMapper mapper;
+    @Resource
+    InfluxDBUtils utils;
 
     private String registerToken = this.generateToken();
 
     private final Map<Integer, Client> clientIdCache = new ConcurrentHashMap<>(); //根据ID找客户端的缓存
     private final Map<String, Client> clientTokenCache = new ConcurrentHashMap<>(); //根据Token找客户端的缓存
+    @Autowired
+    private InfluxDBUtils influxDBUtils;
 
     /**
      * @description: 初始化缓存，把数据库里的加进缓存
@@ -124,7 +130,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
 
-    private Map<Integer , RuntimeDetailVO> currentRuntime = new ConcurrentHashMap<>();
+    private final Map<Integer , RuntimeDetailVO> currentRuntime = new ConcurrentHashMap<>();
     /**
      * @description: 更新运行时的信息
      * @param: [vo, client]
@@ -134,7 +140,8 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
      */
     @Override
     public void updateRuntimeDetail(RuntimeDetailVO vo, Client client) {
-        currentRuntime.put(client.getId(),vo);
+        currentRuntime.put(client.getId(), vo);
+        utils.writeRuntimeData(client.getId(),vo);
     }
 
     /**
