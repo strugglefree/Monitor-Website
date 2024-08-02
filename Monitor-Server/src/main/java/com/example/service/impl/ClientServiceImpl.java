@@ -5,6 +5,7 @@ import com.example.entity.dto.Client;
 import com.example.entity.dto.ClientDetail;
 import com.example.entity.vo.request.ClientDetailVO;
 import com.example.entity.vo.request.RuntimeDetailVO;
+import com.example.entity.vo.response.ClientPreviewVO;
 import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientMapper;
 import com.example.service.ClientService;
@@ -16,10 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -41,6 +39,10 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     private final Map<String, Client> clientTokenCache = new ConcurrentHashMap<>(); //根据Token找客户端的缓存
     @Autowired
     private InfluxDBUtils influxDBUtils;
+    @Autowired
+    private ClientMapper clientMapper;
+    @Autowired
+    private ClientDetailMapper clientDetailMapper;
 
     /**
      * @description: 初始化缓存，把数据库里的加进缓存
@@ -142,6 +144,27 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     public void updateRuntimeDetail(RuntimeDetailVO vo, Client client) {
         currentRuntime.put(client.getId(), vo);
         utils.writeRuntimeData(client.getId(),vo);
+    }
+
+    /**
+     * @description: 获取客户端服务器信息
+     * @param: []
+     * @return: java.util.List<com.example.entity.vo.response.ClientPreviewVO>
+     * @author Ll
+     * @date: 2024/8/2 下午4:06
+     */
+    @Override
+    public List<ClientPreviewVO> listClients() {
+        return clientIdCache.values().stream().map(client -> {
+            ClientPreviewVO vo = client.asViewObject(ClientPreviewVO.class);
+            BeanUtils.copyProperties(clientDetailMapper.selectById(client.getId()),vo);
+            RuntimeDetailVO RDvo = currentRuntime.get(client.getId());
+            if(Objects.nonNull(RDvo) && System.currentTimeMillis() - RDvo.getTimestamp() < 60 * 1000) {
+                BeanUtils.copyProperties(RDvo,vo);
+                vo.setOnline(true);
+            }
+            return vo;
+        }).toList();
     }
 
     /**

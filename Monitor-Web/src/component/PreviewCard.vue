@@ -1,5 +1,8 @@
 <script setup>
-
+import {fitByUnit} from "@/tools";
+const props = defineProps({
+  data: Object
+})
 </script>
 
 <template>
@@ -7,46 +10,53 @@
     <div style="justify-content: space-between;display: flex">
       <div>
         <div class="name">
-          <span class="flag-icon flag-icon-cn"></span>
-          <span style="margin: 0 5px">未命名主机</span>
+          <span :class="`flag-icon flag-icon-${data.location}`"></span>
+          <span style="margin: 0 5px">{{data.name}}</span>
           <i class="fa-solid fa-pen-to-square"></i>
         </div>
         <div class="os">
-          操作系统: Windows 11
+          操作系统: {{data.osName+' '+data.osVersion}}
         </div>
       </div>
-      <div class="status">
+      <div class="status" v-if="data.online">
         <i style="color: #18cb18" class="fa-solid fa-circle-pause"></i>
         <span style="margin-left: 5px">运行中</span>
+      </div>
+      <div class="status" v-else>
+        <i style="color: #d52727" class="fa-solid fa-circle-play"></i>
+        <span style="margin-left: 5px">离线</span>
       </div>
     </div>
     <el-divider style="margin: 10px 0"/>
     <div class="network">
-      <span>公网IP: 192.168.0.5</span>
+      <span>公网IP: {{data.ip}}</span>
       <i class="fa-solid fa-copy" style="margin-left: 10px;color: darkgray"></i>
+    </div>
+    <div class="cpu-name">
+      处理器: {{data.cpuName}}
     </div>
     <div class="hardware">
       <i class="fa-solid fa-microchip"></i>
-      <span style="margin-right: 10px"> 2 CPU</span>
+      <span style="margin-right: 10px">{{' '+data.cpuCore}} CPU</span>
       <i class="fa-solid fa-memory"></i>
-      <span> 4 GB</span>
+      <span> {{ `${data.memory.toFixed(1)} GB` }}</span>
     </div>
     <div class="progress">
-      <span>CPU: 2.5%</span>
-      <el-progress status="success" :show-text="false" :percentage="2.5" :stroke-width="5"/>
+      <span>{{ `CPU: ${(data.cpuUsage * 100).toFixed(2)} %` }}</span>
+      <el-progress status="success" :show-text="false" :percentage="data.cpuUsage * 100" :stroke-width="5"/>
     </div>
     <div class="progress">
-      <span>内存: <b>1.2</b> GB</span>
-      <el-progress status="success" :show-text="false" :percentage="1.2/4 * 100" :stroke-width="5"/>
+      <span>内存: <b>{{data.memoryUsage.toFixed(2)}}</b> GB</span>
+      <el-progress status="success" :show-text="false" :percentage="data.memoryUsage/data.memory * 100" :stroke-width="5"/>
     </div>
     <div class="network-flow">
       <div>网络流量</div>
       <div>
         <i class="fa-solid fa-upload"></i>
-        <span> 52 KB/s</span>
+        <span>{{' ' + fitByUnit(data.networkUpload,"KB") + '/s'}}</span>
         <el-divider direction="vertical"/>
         <i class="fa-solid fa-download"></i>
-        <span> 255 KB/s</span>
+        <span>{{' ' + fitByUnit(data.networkDownload,"KB") + '/s'}}</span>
       </div>
     </div>
   </div>
@@ -88,6 +98,10 @@
 
   .network{
     font-size: 13px;
+  }
+
+  .cpu-name{
+    font-size: 12px;
   }
 
   .hardware{

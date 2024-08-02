@@ -1,1 +1,2 @@
-spring.application.name=Monitor-Client
+server:
+  port: 80

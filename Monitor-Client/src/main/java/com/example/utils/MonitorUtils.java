@@ -49,7 +49,7 @@ public class MonitorUtils {
                 .setOsVersion(operatingSystem.getVersionInfo().getVersion())
                 .setOsBit(operatingSystem.getBitness())
                 .setCpuName(hardware.getProcessor().getProcessorIdentifier().getName())
-                .setCpuCore(hardware.getProcessor().getPhysicalProcessorCount())
+                .setCpuCore(hardware.getProcessor().getLogicalProcessorCount())
                 .setMemory(memory)
                 .setDisk(diskSize)
                 .setIp(ip);
@@ -141,7 +141,7 @@ public class MonitorUtils {
                 NetworkInterface networkInterface = networkIF.queryNetworkInterface();
                 if(networkInterface.isUp() && !networkInterface.isLoopback()
                 && !networkInterface.isVirtual() && !networkInterface.isPointToPoint()
-                && (networkInterface.getName().startsWith("eth") || networkInterface.getName().startsWith("en"))
+                && (networkInterface.getName().startsWith("eth") || networkInterface.getName().startsWith("en") || networkInterface.getName().startsWith("wlan"))
                 && ipv4.length > 0){
                     return networkIF;
                 }

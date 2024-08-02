@@ -1,6 +1,13 @@
 <script setup>
 
 import PreviewCard from "@/component/PreviewCard.vue";
+import {ref} from "vue";
+import {get} from "@/net";
+
+const list = ref([])
+const updateList = () => get(`/api/monitor/list`,data => list.value = data)
+setInterval(updateList,10*1000)
+updateList()
 </script>
 
 <template>
@@ -14,9 +21,7 @@ import PreviewCard from "@/component/PreviewCard.vue";
     </div>
     <el-divider style="margin: 10px 0"/>
     <div class="card-list">
-      <preview-card />
-      <preview-card />
-      <preview-card />
+      <preview-card v-for="item in list" :data="item"/>
     </div>
   </div>
 </template>
