@@ -1,5 +1,5 @@
 <script setup>
-import {fitByUnit} from "@/tools";
+import {fitByUnit, percentageToStatus} from "@/tools";
 import {useClipboard} from "@vueuse/core";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {post} from "@/net";
@@ -69,15 +69,15 @@ function rename(){
       <i class="fa-solid fa-microchip"></i>
       <span style="margin-right: 10px">{{' '+data.cpuCore}} CPU</span>
       <i class="fa-solid fa-memory"></i>
-      <span> {{ `${data.memory.toFixed(1)} GB` }}</span>
+      <span> {{ ` ${data.memory.toFixed(1)} GB` }}</span>
     </div>
     <div class="progress">
       <span>{{ `CPU: ${(data.cpuUsage * 100).toFixed(2)} %` }}</span>
-      <el-progress status="success" :show-text="false" :percentage="data.cpuUsage * 100" :stroke-width="5"/>
+      <el-progress :status="percentageToStatus(data.cpuUsage * 100)" :show-text="false" :percentage="data.cpuUsage * 100" :stroke-width="5"/>
     </div>
     <div class="progress">
       <span>内存: <b>{{data.memoryUsage.toFixed(2)}}</b> GB</span>
-      <el-progress status="success" :show-text="false" :percentage="data.memoryUsage/data.memory * 100" :stroke-width="5"/>
+      <el-progress :status="percentageToStatus(data.memoryUsage/data.memory * 100)" :show-text="false" :percentage="data.memoryUsage/data.memory * 100" :stroke-width="5"/>
     </div>
     <div class="network-flow">
       <div>网络流量</div>
@@ -93,13 +93,6 @@ function rename(){
 </template>
 
 <style scoped>
-:deep(.el-progress-bar__outer){
-  background-color: #18cb1822;
-}
-
-:deep(.el-progress-bar__inner){
-  background-color: #18cb18;
-}
 
 .dark .instance-card{
   color: #d9d9d9;
@@ -122,6 +115,12 @@ function rename(){
   border-radius: 5px;
   box-sizing: border-box;
   color: #5a5a5a;
+  transition: .3s;
+
+  &:hover{
+    cursor: pointer;
+    scale: 1.02;
+  }
 
   .name{
     font-weight: bold;
