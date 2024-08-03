@@ -1,9 +1,11 @@
 package com.example.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Client;
 import com.example.entity.dto.ClientDetail;
 import com.example.entity.vo.request.ClientDetailVO;
+import com.example.entity.vo.request.RenameClientVO;
 import com.example.entity.vo.request.RuntimeDetailVO;
 import com.example.entity.vo.response.ClientPreviewVO;
 import com.example.mapper.ClientDetailMapper;
@@ -37,10 +39,6 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     private final Map<Integer, Client> clientIdCache = new ConcurrentHashMap<>(); //根据ID找客户端的缓存
     private final Map<String, Client> clientTokenCache = new ConcurrentHashMap<>(); //根据Token找客户端的缓存
-    @Autowired
-    private InfluxDBUtils influxDBUtils;
-    @Autowired
-    private ClientMapper clientMapper;
     @Autowired
     private ClientDetailMapper clientDetailMapper;
 
@@ -165,6 +163,19 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
             }
             return vo;
         }).toList();
+    }
+
+    /**
+     * @description: 重命名客户端
+     * @param: [vo]
+     * @return: void
+     * @author Ll
+     * @date: 2024/8/3 下午12:46
+     */
+    @Override
+    public void renameClient(RenameClientVO vo) {
+        this.update(Wrappers.<Client>update().eq("id", vo.getId()).set("name", vo.getName()));
+        this.initClientCache();
     }
 
     /**
