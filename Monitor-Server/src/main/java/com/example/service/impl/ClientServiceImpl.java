@@ -6,6 +6,7 @@ import com.example.entity.dto.Client;
 import com.example.entity.dto.ClientDetail;
 import com.example.entity.vo.request.ClientDetailVO;
 import com.example.entity.vo.request.RenameClientVO;
+import com.example.entity.vo.request.RenameNodeVO;
 import com.example.entity.vo.request.RuntimeDetailVO;
 import com.example.entity.vo.response.ClientDetailsVO;
 import com.example.entity.vo.response.ClientPreviewVO;
@@ -179,12 +180,34 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         this.initClientCache();
     }
 
+    /**
+     * @description: 获取客户端详细信息
+     * @param: [clientId]
+     * @return: com.example.entity.vo.response.ClientDetailsVO
+     * @author Ll
+     * @date: 2024/8/9 下午5:31
+     */
     @Override
     public ClientDetailsVO getClientDetails(int clientId) {
         ClientDetailsVO vo = this.clientIdCache.get(clientId).asViewObject(ClientDetailsVO.class);
         BeanUtils.copyProperties(clientDetailMapper.selectById(clientId),vo);
         vo.setOnline(this.isOnline(currentRuntime.get(clientId)));
         return vo;
+    }
+
+    /**
+     * @description: 重命名节点
+     * @param: [vo]
+     * @return: void
+     * @author Ll
+     * @date: 2024/8/9 下午5:31
+     */
+    @Override
+    public void renameNode(RenameNodeVO vo) {
+        System.out.println(vo.getNode());
+        this.update(Wrappers.<Client>update().eq("id", vo.getId())
+                .set("node", vo.getNode()).set("location", vo.getLocation()));
+        this.initClientCache();
     }
 
     /**

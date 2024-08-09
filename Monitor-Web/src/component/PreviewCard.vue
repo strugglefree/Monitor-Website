@@ -33,6 +33,13 @@ function rename(){
     props.update()
   }))
 }
+
+function truncateString(str, maxLength) {
+  if (str.length > maxLength) {
+    return str.slice(0, maxLength) + '...';
+  }
+  return str;
+}
 </script>
 
 <template>
@@ -63,7 +70,7 @@ function rename(){
       <i class="fa-solid fa-copy interact-item" @click.stop="copyIp" style="margin-left: 10px;color: darkgray"></i>
     </div>
     <div class="cpu-name">
-      处理器: {{data.cpuName}}
+      处理器: {{truncateString(data.cpuName, 30)}}
     </div>
     <div class="hardware">
       <i class="fa-solid fa-microchip"></i>
