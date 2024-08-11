@@ -10,6 +10,7 @@ import com.example.entity.vo.request.RenameNodeVO;
 import com.example.entity.vo.request.RuntimeDetailVO;
 import com.example.entity.vo.response.ClientDetailsVO;
 import com.example.entity.vo.response.ClientPreviewVO;
+import com.example.entity.vo.response.RuntimeDetailsVO;
 import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientMapper;
 import com.example.service.ClientService;
@@ -204,10 +205,36 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
      */
     @Override
     public void renameNode(RenameNodeVO vo) {
-        System.out.println(vo.getNode());
         this.update(Wrappers.<Client>update().eq("id", vo.getId())
                 .set("node", vo.getNode()).set("location", vo.getLocation()));
         this.initClientCache();
+    }
+
+    /**
+     * @description: 获取一个小时内的运行数据
+     * @param: [clientId]
+     * @return: com.example.entity.vo.response.RuntimeDetailsVO
+     * @author Ll
+     * @date: 2024/8/11 上午7:55
+     */
+    @Override
+    public RuntimeDetailsVO getRuntimeDetailsHistory(int clientId) {
+        RuntimeDetailsVO vo = utils.readRuntimeData(clientId);
+        ClientDetail detail = clientDetailMapper.selectById(clientId);
+        BeanUtils.copyProperties(detail,vo);
+        return vo;
+    }
+
+    /**
+     * @description: 获取现在的运行时数据
+     * @param: [clientId]
+     * @return: com.example.entity.vo.request.RuntimeDetailVO
+     * @author Ll
+     * @date: 2024/8/11 上午7:55
+     */
+    @Override
+    public RuntimeDetailVO getRuntimeDetailNow(int clientId) {
+        return currentRuntime.get(clientId);
     }
 
     /**
