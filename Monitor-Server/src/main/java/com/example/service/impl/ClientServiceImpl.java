@@ -54,6 +54,8 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
      */
     @PostConstruct
     public void initClientCache() {
+        clientIdCache.clear();
+        clientTokenCache.clear();
         this.list().forEach(this::addClientCache);
     }
 
@@ -238,6 +240,21 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     /**
+     * @description: 删除客户端
+     * @param: [clientId]
+     * @return: void
+     * @author Ll
+     * @date: 2024/8/11 下午1:15
+     */
+    @Override
+    public void deleteClient(int clientId) {
+       this.removeById(clientId);
+       mapper.deleteById(clientId);
+       this.initClientCache();
+       currentRuntime.remove(clientId);
+    }
+
+    /**
      * @description: 客户端是否在线
      * @param: [vo]
      * @return: boolean
@@ -279,13 +296,12 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
      * @date: 2024/7/27 下午3:25
      */
     private String generateToken() {
-        String CHARACTERS = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
+        String CHARACTERS = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789";
         SecureRandom random = new SecureRandom();
         StringBuilder sb = new StringBuilder(24);
         for (int i = 0; i < 24; i++) {
             sb.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
         }
-        System.out.println(sb);
         return sb.toString();
     }
 }

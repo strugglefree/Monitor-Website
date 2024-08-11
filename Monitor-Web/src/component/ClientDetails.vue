@@ -5,6 +5,7 @@ import {cpuNameToImage, fitByUnit, osNameToIcon, percentageToStatus} from "@/too
 import {useClipboard} from "@vueuse/core";
 import {ElMessage} from "element-plus";
 import RuntimeHistory from "@/component/RuntimeHistory.vue";
+import {Delete} from "@element-plus/icons-vue";
 
 const locations = [
   {name: 'cn', desc: '中国大陆'},
@@ -15,6 +16,8 @@ const locations = [
   {name: 'kr', desc: '韩国'},
   {name: 'de', desc: '德国'}
 ]
+
+const emits = defineEmits(['delete'])
 
 const props = defineProps({
   id: Number,
@@ -49,10 +52,25 @@ function updateDetails() {
   init(props.id)
 }
 
+function deleteClient() {
+  ElMessageBox.confirm('删除此主机后所有统计数据都将丢失，您确定要这样做吗？', '删除主机', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(() => {
+    get(`/api/monitor/delete?clientId=${props.id}`, () => {
+      emits('delete')
+      props.update()
+      ElMessage.success('主机已成功移除')
+    })
+  }).catch(() => {})
+}
+
 setInterval(() => {
   if(props.id !== -1 && details.runtime) {
     get(`/api/monitor/runtime-now?clientId=${props.id}`, data => {
-      details.runtime.list.splice(0, 1)
+      if(details.runtime.list.length >= 360)
+        details.runtime.list.splice(0, 1)
       details.runtime.list.push(data)
     })
   }
@@ -89,9 +107,12 @@ watch(() => props.id, init, { immediate: true })
   <el-scrollbar>
     <div class="client-details" v-loading="Object.keys(details.base).length === 0">
       <div v-if="Object.keys(details.base).length">
-        <div class="title">
-          <i class="fa-solid fa-server"></i>
-          <span> 服务器信息</span>
+        <div style="display: flex;justify-content: space-between">
+          <div class="title">
+            <i class="fa-solid fa-server"></i>
+            <span> 服务器信息</span>
+          </div>
+          <el-button :icon="Delete" type="danger" text plain @click="deleteClient">删除此主机</el-button>
         </div>
         <el-divider style="margin: 10px 0"/>
         <div class="details-list">
