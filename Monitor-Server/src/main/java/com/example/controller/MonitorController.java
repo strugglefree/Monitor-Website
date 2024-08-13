@@ -6,6 +6,7 @@ import com.example.entity.vo.request.RenameNodeVO;
 import com.example.entity.vo.request.RuntimeDetailVO;
 import com.example.entity.vo.response.ClientDetailsVO;
 import com.example.entity.vo.response.ClientPreviewVO;
+import com.example.entity.vo.response.ClientSimpleVO;
 import com.example.entity.vo.response.RuntimeDetailsVO;
 import com.example.service.ClientService;
 import jakarta.annotation.Resource;
@@ -29,6 +30,11 @@ public class MonitorController {
     @GetMapping("/list")
     public RestBean<List<ClientPreviewVO>> listAllClient(){
         return RestBean.success(service.listClients());
+    }
+
+    @GetMapping("/simple-list")
+    public RestBean<List<ClientSimpleVO>> listSimpleClient(){
+        return RestBean.success(service.listClientSimples());
     }
 
     @PostMapping("/rename")

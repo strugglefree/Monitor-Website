@@ -10,6 +10,7 @@ import com.example.entity.vo.request.RenameNodeVO;
 import com.example.entity.vo.request.RuntimeDetailVO;
 import com.example.entity.vo.response.ClientDetailsVO;
 import com.example.entity.vo.response.ClientPreviewVO;
+import com.example.entity.vo.response.ClientSimpleVO;
 import com.example.entity.vo.response.RuntimeDetailsVO;
 import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientMapper;
@@ -166,6 +167,22 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
                 BeanUtils.copyProperties(RDvo,vo);
                 vo.setOnline(true);
             }
+            return vo;
+        }).toList();
+    }
+
+    /**
+     * @description: 获取所有客户端基本信息
+     * @param: []
+     * @return: java.util.List<com.example.entity.vo.response.ClientSimpleVO>
+     * @author Ll
+     * @date: 2024/8/13 下午3:37
+     */
+    @Override
+    public List<ClientSimpleVO> listClientSimples() {
+        return clientIdCache.values().stream().map(client -> {
+            ClientSimpleVO vo = client.asViewObject(ClientSimpleVO.class);
+            BeanUtils.copyProperties(clientDetailMapper.selectById(client.getId()),vo);
             return vo;
         }).toList();
     }
