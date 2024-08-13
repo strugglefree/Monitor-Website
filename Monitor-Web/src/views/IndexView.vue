@@ -23,7 +23,9 @@
     <el-main class="main-content">
       <router-view v-slot="{ Component }">
         <transition mode="out-in" name="el-fade-in-linear">
-          <component :is="Component"/>
+          <keep-alive exclude="Security">
+            <component :is="Component"/>
+          </keep-alive>
         </transition>
       </router-view>
     </el-main>
