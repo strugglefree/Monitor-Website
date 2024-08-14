@@ -4,10 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Account;
-import com.example.entity.vo.request.ChangePasswordVO;
-import com.example.entity.vo.request.ConfirmResetVO;
-import com.example.entity.vo.request.CreateSubAccountVO;
-import com.example.entity.vo.request.EmailResetVO;
+import com.example.entity.vo.request.*;
 import com.example.entity.vo.response.SubAccountVO;
 import com.example.mapper.AccountMapper;
 import com.example.service.AccountService;
@@ -187,6 +184,28 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
                     vo.setClientList(JSONArray.parse(account.getClients()));
                     return vo;
                 }).toList();
+    }
+
+    /**
+     * @description: 更改邮箱(检查验证码是否正确)
+     * @param: [uid, vo]
+     * @return: void
+     * @author Ll
+     * @date: 2024/8/14 下午3:46
+     */
+    @Override
+    public String modifyEmail(int uid, ModifyEmailVO vo) {
+        String code = this.getEmailVerifyCode(vo.getEmail());
+        if(code == null) return "请先获取验证码！";
+        if(!code.equals(vo.getCode())) return "验证码错误，请重新输入";
+        Account account = this.findAccountByNameOrEmail(vo.getEmail());
+        if(account != null && account.getId() != uid) return "该邮箱已被其他用户使用，请重新输入其他邮箱";
+        this.deleteEmailVerifyCode(vo.getEmail());
+        this.update()
+                .eq("id", uid)
+                .set("email", vo.getEmail())
+                .update();
+        return null;
     }
 
     /**
