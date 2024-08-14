@@ -6,6 +6,7 @@ import {useClipboard} from "@vueuse/core";
 import {ElMessage} from "element-plus";
 import RuntimeHistory from "@/component/RuntimeHistory.vue";
 import {Delete} from "@element-plus/icons-vue";
+import {useStore} from "@/store";
 
 const locations = [
   {name: 'cn', desc: '中国大陆'},
@@ -101,6 +102,8 @@ const init = id => {
 }
 
 watch(() => props.id, init, { immediate: true })
+
+const store = useStore()
 </script>
 
 <template>
@@ -112,7 +115,7 @@ watch(() => props.id, init, { immediate: true })
             <i class="fa-solid fa-server"></i>
             <span> 服务器信息</span>
           </div>
-          <el-button :icon="Delete" type="danger" text plain @click="deleteClient">删除此主机</el-button>
+          <el-button :icon="Delete" type="danger" text plain @click="deleteClient" v-if="store.isAdmin">删除此主机</el-button>
         </div>
         <el-divider style="margin: 10px 0"/>
         <div class="details-list">

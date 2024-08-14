@@ -7,9 +7,11 @@ import ClientDetails from "@/component/ClientDetails.vue";
 import RegisterCard from "@/component/RegisterCard.vue";
 import {Plus} from "@element-plus/icons-vue";
 import {useRoute} from "vue-router";
+import {useStore} from "@/store";
 
 const list = ref([])
 const route = useRoute()
+const store = useStore()
 
 const locations = [
   {name: 'cn', desc: '中国大陆'},
@@ -65,7 +67,7 @@ const refreshToken = () => get(`/api/monitor/register`,
           在这里管理所有已经注册的主机实例，实时监控主机运行状态，快速进行管理和操作
         </div>
       </div>
-      <div>
+      <div v-if="store.isAdmin">
         <el-button :icon="Plus" plain type="primary" @click="register.show = true">添加新的主机</el-button>
       </div>
     </div>

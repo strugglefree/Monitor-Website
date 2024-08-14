@@ -1,10 +1,11 @@
 <script setup>
 import {reactive, ref} from "vue";
-import {Unlock, Lock, Check, RefreshRight, Plus} from "@element-plus/icons-vue";
+import {Unlock, Lock, Check, RefreshRight, Plus, Delete} from "@element-plus/icons-vue";
 import {get, logout, post} from "@/net";
 import {ElMessage} from "element-plus";
 import router from "@/router";
 import CreateSubAccount from "@/component/CreateSubAccount.vue";
+import {useStore} from "@/store";
 
 const validatePassword = (rule, value, callback) => {
   if (value === '') {
@@ -34,6 +35,7 @@ const form = reactive({
   new_password: '',
   check_password: ''
 })
+const store = useStore()
 const onValidate = (prop , isValid) => valid.value = isValid
 
 function resetPassword(){
@@ -54,10 +56,13 @@ const initSubAccounts = () =>
 const createAccount = ref(false)
 
 const simpleList = ref([])
-get(`/api/monitor/simple-list`,(data)=>{
-  simpleList.value = data
-  initSubAccounts()
-})
+
+if(store.isAdmin){
+  get(`/api/monitor/simple-list`,(data)=>{
+    simpleList.value = data
+    initSubAccounts()
+  })
+}
 
 function deleteAccount(id) {
   get(`/api/user/sub/delete?uid=${id}`, () => {
@@ -113,9 +118,10 @@ function deleteAccount(id) {
                    @click="createAccount = true" plain>添加更多子用户</el-button>
       </div>
       <div v-else>
-        <el-empty :image-size="100" description="还没有任何子账户哦">
+        <el-empty :image-size="100" description="还没有任何子账户哦" v-if="store.isAdmin">
           <el-button :icon="Plus" type="primary" plain @click="createAccount = true">添加子账户</el-button>
         </el-empty>
+        <el-empty :image-size="100" description="子账户只能由管理员创建" v-else/>
       </div>
     </div>
     <el-drawer v-model="createAccount" size="350" :with-header="false">

@@ -8,6 +8,14 @@
         <el-switch style="margin: 0 20px" v-model="dark"
                    active-color="#424242" :active-action-icon="Moon"
                    :inactive-action-icon="Sunny"/>
+        <div style="line-height: 16px;margin-right: 10px;text-align: right">
+          <div style="font-size: 16px;font-weight: bold">
+            <el-tag type="success" size="small" v-if="store.isAdmin">管理员</el-tag>
+            <el-tag v-else size="small">子账户</el-tag>
+            {{store.user.username}}
+          </div>
+          <div style="color: grey;font-size: 13px">{{store.user.email}}</div>
+        </div>
         <el-dropdown>
           <el-avatar class="avatar"
                       src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjfRcDr9Qe59D7vuhTk-Rq-4nejF0fFn0QVA&s"/>
@@ -40,6 +48,7 @@ import {ref} from "vue";
 import {useDark} from "@vueuse/core";
 import TabItem from "@/component/TabItem.vue";
 import {useRoute} from "vue-router";
+import {useStore} from "@/store";
 
 const tabs = [
   {id: 1, name: "管理", route: 'manage'},
@@ -53,6 +62,8 @@ const defaultIndex = () => {
   }
   return 1;
 }
+
+const store = useStore()
 
 const dark = ref(useDark())
 const tab = ref(defaultIndex())

@@ -6,11 +6,14 @@ import axios from "axios";
 import '@/assets/css/element.less'
 import 'flag-icon-css/css/flag-icons.min.css'
 import 'element-plus/theme-chalk/dark/css-vars.css'
+import {createPinia} from "pinia";
+import piniaPluginPersistedState from 'pinia-plugin-persistedstate'
 
 axios.defaults.baseURL = 'http://localhost:8080'
 
 const app = createApp(App)
-
+const pinia = createPinia()
 app.use(router)
-
+app.use(pinia)
+pinia.use(piniaPluginPersistedState)
 app.mount('#app')
