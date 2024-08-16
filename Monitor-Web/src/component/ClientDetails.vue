@@ -5,7 +5,7 @@ import {cpuNameToImage, fitByUnit, osNameToIcon, percentageToStatus} from "@/too
 import {useClipboard} from "@vueuse/core";
 import {ElMessage} from "element-plus";
 import RuntimeHistory from "@/component/RuntimeHistory.vue";
-import {Delete} from "@element-plus/icons-vue";
+import {Connection, Delete} from "@element-plus/icons-vue";
 import {useStore} from "@/store";
 
 const locations = [
@@ -18,7 +18,7 @@ const locations = [
   {name: 'de', desc: '德国'}
 ]
 
-const emits = defineEmits(['delete'])
+const emits = defineEmits(['delete', 'terminal'])
 
 const props = defineProps({
   id: Number,
@@ -115,7 +115,14 @@ const store = useStore()
             <i class="fa-solid fa-server"></i>
             <span> 服务器信息</span>
           </div>
-          <el-button :icon="Delete" type="danger" text plain @click="deleteClient" v-if="store.isAdmin">删除此主机</el-button>
+          <div>
+            <el-button :icon="Connection" type="success" text plain @click="emits('terminal', id)" v-if="store.isAdmin">
+              SSH远程连接
+            </el-button>
+            <el-button :icon="Delete" type="danger" text plain @click="deleteClient" v-if="store.isAdmin" style="margin-left: 0">
+              删除此主机
+            </el-button>
+          </div>
         </div>
         <el-divider style="margin: 10px 0"/>
         <div class="details-list">

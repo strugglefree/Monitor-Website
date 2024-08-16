@@ -4,16 +4,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Client;
 import com.example.entity.dto.ClientDetail;
-import com.example.entity.vo.request.ClientDetailVO;
-import com.example.entity.vo.request.RenameClientVO;
-import com.example.entity.vo.request.RenameNodeVO;
-import com.example.entity.vo.request.RuntimeDetailVO;
-import com.example.entity.vo.response.ClientDetailsVO;
-import com.example.entity.vo.response.ClientPreviewVO;
-import com.example.entity.vo.response.ClientSimpleVO;
-import com.example.entity.vo.response.RuntimeDetailsVO;
+import com.example.entity.dto.ClientSsh;
+import com.example.entity.vo.request.*;
+import com.example.entity.vo.response.*;
 import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientMapper;
+import com.example.mapper.ClientSshMapper;
 import com.example.service.ClientService;
 import com.example.utils.InfluxDBUtils;
 import jakarta.annotation.PostConstruct;
@@ -38,6 +34,8 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     private ClientDetailMapper mapper;
     @Resource
     InfluxDBUtils utils;
+    @Resource
+    ClientSshMapper sshMapper;
 
     private String registerToken = this.generateToken();
 
@@ -269,6 +267,45 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
        mapper.deleteById(clientId);
        this.initClientCache();
        currentRuntime.remove(clientId);
+    }
+
+    /**
+     * @description: 保存ssh连接信息
+     * @param: [vo]
+     * @return: void
+     * @author Ll
+     * @date: 2024/8/16 下午3:35
+     */
+    @Override
+    public void saveClientSshConnection(SshConnectionVO vo) {
+        Client client = clientIdCache.get(vo.getId());
+        if(!Objects.nonNull(client)) { return; }
+        ClientSsh ssh = new ClientSsh();
+        BeanUtils.copyProperties(vo,ssh);
+        if(Objects.nonNull(sshMapper.selectById(vo.getId()))) {
+            sshMapper.updateById(ssh);
+        }else
+            sshMapper.insert(ssh);
+    }
+
+    /**
+     * @description: 获取ssh连接设置
+     * @param: [clientId]
+     * @return: com.example.entity.vo.response.SshSettingVO
+     * @author Ll
+     * @date: 2024/8/16 下午3:36
+     */
+    @Override
+    public SshSettingVO getSshSetting(int clientId) {
+        ClientDetail detail = clientDetailMapper.selectById(clientId);
+        ClientSsh ssh = sshMapper.selectById(clientId);
+        SshSettingVO vo;
+        if(Objects.nonNull(ssh)) {
+            vo = ssh.asViewObject(SshSettingVO.class);
+        }else
+            vo = new SshSettingVO();
+        vo.setIp(detail.getIp());
+        return vo;
     }
 
     /**
