@@ -103,8 +103,8 @@ const terminal = reactive({
                style="width: 600px; margin: 10px auto" size="320" @open="refreshToken">
       <register-card :token="register.token"/>
     </el-drawer>
-    <el-drawer style="width: 800px;margin: auto" direction="btt" :size="500"
-               :close-on-click-modal="false" v-model="terminal.show">
+    <el-drawer style="width: 800px;margin: auto" direction="btt" :size="520"
+               :close-on-click-modal="false" v-model="terminal.show" @close="terminal.id = -1">
       <template #header>
         <div>
           <div style="color: dodgerblue;font-size: 18px;font-weight: bold">
